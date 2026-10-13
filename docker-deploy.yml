@@ -1,0 +1,44 @@
+---
+- name: Deploy AttendFlow Attendance Tracker Application with Docker
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    app_name: "attendance-ansible"
+    image_name: "attendance-app:latest"
+    host_port: "8086"
+    container_port: "80"
+    volume_name: "attendance_data"
+
+  tasks:
+    - name: Stop and remove existing containers
+      shell: |
+        docker stop {{ app_name }} attendance-container 2>/dev/null || true
+        docker rm {{ app_name }} attendance-container 2>/dev/null || true
+      changed_when: false
+
+    - name: Ensure persistent Docker volume exists
+      shell: |
+        docker volume create {{ volume_name }}
+      changed_when: false
+
+    - name: Deploy Attendance Tracker container with persistent storage via Ansible
+      shell: |
+        docker run -d --name {{ app_name }} -p {{ host_port }}:{{ container_port }} -v {{ volume_name }}:/usr/share/nginx/html/data --restart unless-stopped {{ image_name }}
+      register: deploy_result
+
+    - name: Verify deployed container
+      shell: |
+        docker ps --filter "name={{ app_name }}"
+      register: container_status
+
+    - name: Display deployment verification output
+      debug:
+        msg:
+          - "=========================================="
+          - "Ansible Deployment Status: SUCCESS"
+          - "Application Container: {{ app_name }}"
+          - "URL: http://localhost:{{ host_port }}"
+          - "=========================================="
+
