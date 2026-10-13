@@ -2,7 +2,7 @@
     agent any
 
     environment {
-        PATH = C:\\Users\\Hi\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;
+        PATH = "C:\\Users\\Hi\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
         IMAGE_NAME = 'attendance-app'
         CONTAINER_NAME = 'attendance-container'
         APP_PORT = '8086'
@@ -19,7 +19,7 @@
         stage('Automated Testing') {
             steps {
                 echo '=== Stage 2: Automated Testing (Pytest / Python) ==='
-                bat 'docker run --rm -v %WORKSPACE%:/app -w /app python:3.11-alpine python test_app.py'
+                bat 'docker run --rm -v "%WORKSPACE%":/app -w /app python:3.11-alpine python test_app.py'
             }
         }
 
@@ -44,8 +44,8 @@
         stage('Verification') {
             steps {
                 echo '=== Stage 5: Verifying Application Health ==='
-                bat 'docker ps --filter name=%CONTAINER_NAME%'
-                echo Application successfully deployed at: http://localhost:
+                bat 'docker ps --filter "name=%CONTAINER_NAME%"'
+                echo "Application successfully deployed at: http://localhost:${APP_PORT}"
             }
         }
     }
@@ -59,3 +59,4 @@
         }
     }
 }
+
