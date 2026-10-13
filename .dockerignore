@@ -1,0 +1,7 @@
+﻿.git
+.gitignore
+*.docx
+README.md
+Jenkinsfile
+test_app.py
+*.log
